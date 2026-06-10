@@ -70,8 +70,6 @@ export default async function FinanceSummaryPage() {
 
   return (
     <FinanceSummaryClient
-      session={session}
-      categories={categories}
       initialSummary={{
         totalExpenses,
         totalIncome,

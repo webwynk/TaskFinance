@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
-import { Calendar, ArrowLeft, TrendingUp, TrendingDown, DollarSign } from 'lucide-react'
+import { ArrowLeft, TrendingUp, TrendingDown, DollarSign } from 'lucide-react'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend
@@ -30,17 +30,14 @@ interface SummaryData {
 }
 
 interface Props {
-  session: { user: { id: string; name: string; role: string } }
-  categories: Array<{ id: string; name: string; colorBg: string; colorText: string }>
   initialSummary: SummaryData
 }
 
-export default function FinanceSummaryClient({ session, categories, initialSummary }: Props) {
+export default function FinanceSummaryClient({ initialSummary }: Props) {
   const [summary, setSummary] = useState<SummaryData>(initialSummary)
   const [period, setPeriod] = useState<'month' | 'week' | 'custom'>('month')
   const [fromDate, setFromDate] = useState('')
   const [toDate, setToDate] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
 
   // Hydration guard
@@ -282,7 +279,7 @@ export default function FinanceSummaryClient({ session, categories, initialSumma
                   <Tooltip
                     contentStyle={{ background: 'var(--bg-surface)', border: '1px solid var(--border-default)', borderRadius: '6px', fontSize: '12px' }}
                     labelStyle={{ fontWeight: 600, color: 'var(--text-primary)' }}
-                    formatter={(val: any) => [formatCurrency(val), 'Spent']}
+                    formatter={(val: number | string | boolean) => [formatCurrency(Number(val)), 'Spent']}
                   />
                   <Bar dataKey="amount" fill="var(--color-rose-deep)" radius={[4, 4, 0, 0]} />
                 </BarChart>
@@ -316,7 +313,7 @@ export default function FinanceSummaryClient({ session, categories, initialSumma
                     </Pie>
                     <Tooltip
                       contentStyle={{ background: 'var(--bg-surface)', border: '1px solid var(--border-default)', borderRadius: '6px', fontSize: '12px' }}
-                      formatter={(val: any) => [formatCurrency(val), 'Total']}
+                      formatter={(val: number | string | boolean) => [formatCurrency(Number(val)), 'Total']}
                     />
                     <Legend
                       verticalAlign="bottom"
@@ -339,7 +336,7 @@ export default function FinanceSummaryClient({ session, categories, initialSumma
                 <YAxis tick={{ fill: 'var(--text-secondary)', fontSize: '11px' }} axisLine={false} tickLine={false} />
                 <Tooltip
                   contentStyle={{ background: 'var(--bg-surface)', border: '1px solid var(--border-default)', borderRadius: '6px', fontSize: '12px' }}
-                  formatter={(val: any) => [formatCurrency(val), '']}
+                  formatter={(val: number | string | boolean) => [formatCurrency(Number(val)), '']}
                 />
                 <Bar dataKey="Income" fill="var(--color-mint-deep)" radius={[4, 4, 0, 0]} maxBarSize={60} />
                 <Bar dataKey="Expenses" fill="var(--color-rose-deep)" radius={[4, 4, 0, 0]} maxBarSize={60} />

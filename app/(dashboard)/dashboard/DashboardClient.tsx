@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { CheckSquare, Wallet, Target, Plus, ArrowRight, TrendingDown, TrendingUp } from 'lucide-react'
+import { CheckSquare, Wallet, Target, Plus, ArrowRight, TrendingDown } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils/formatCurrency'
-import { resolveTaskStatus, STATUS_CONFIG, PRIORITY_CONFIG } from '@/lib/utils/taskStatus'
-import { formatDate, getDueDateLabel } from '@/lib/utils/formatDate'
+import { resolveTaskStatus } from '@/lib/utils/taskStatus'
+import { getDueDateLabel } from '@/lib/utils/formatDate'
 import toast from 'react-hot-toast'
 
 interface Props {
@@ -19,9 +19,9 @@ interface Props {
     budgetRemaining: number
     budgetPercentage: number
   }
-  todayTasks: any[]
-  todayEntries: any[]
-  categories: any[]
+  todayTasks: Array<{ id: string; title: string; status: string; dueDate?: Date | string | null; priority: string }>
+  todayEntries: Array<{ id: string; title: string; amount: number; type: string; category: { name: string; colorBg: string; colorText: string } }>
+  categories: Array<{ id: string; name: string; colorBg: string; colorText: string }>
 }
 
 export default function DashboardClient({ session, stats, todayTasks, todayEntries, categories }: Props) {
@@ -193,7 +193,7 @@ export default function DashboardClient({ session, stats, todayTasks, todayEntri
           <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <CheckSquare size={18} color="var(--color-lavender-deep)" />
-              <h2 className="text-h3" style={{ color: 'var(--text-primary)' }}>Today's Tasks</h2>
+              <h2 className="text-h3" style={{ color: 'var(--text-primary)' }}>Today&apos;s Tasks</h2>
               {tasks.length > 0 && (
                 <span className="chip" style={{ background: 'var(--color-lavender)', color: 'var(--color-lavender-deep)' }}>
                   {tasks.length}
@@ -284,7 +284,7 @@ export default function DashboardClient({ session, stats, todayTasks, todayEntri
           <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <Wallet size={18} color="var(--color-lavender-deep)" />
-              <h2 className="text-h3" style={{ color: 'var(--text-primary)' }}>Today's Spending</h2>
+              <h2 className="text-h3" style={{ color: 'var(--text-primary)' }}>Today&apos;s Spending</h2>
             </div>
             <span className="text-h3" style={{ color: 'var(--color-lavender-deep)' }}>
               {formatCurrency(stats.todaySpend)}

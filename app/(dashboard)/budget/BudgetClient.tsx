@@ -1,19 +1,18 @@
 'use client'
 
 import { useState } from 'react'
-import { Target, Edit3, Check, TrendingDown } from 'lucide-react'
+import { Edit3, Check } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils/formatCurrency'
 import { formatMonthYear } from '@/lib/utils/formatDate'
 import toast from 'react-hot-toast'
 
 interface Props {
   budget: { goalAmount: number; spentAmount: number; month: number; year: number }
-  history: any[]
-  categoryBreakdown: Array<{ category: any; amount: number }>
-  isAdmin: boolean
+  history: Array<{ goalAmount: any; spentAmount: any; month: number; year: number }>
+  categoryBreakdown: Array<{ category: { id: string; name: string; colorBg: string; colorText: string } | null; amount: number }>
 }
 
-export default function BudgetClient({ budget: initialBudget, history, categoryBreakdown, isAdmin }: Props) {
+export default function BudgetClient({ budget: initialBudget, history, categoryBreakdown }: Props) {
   const [budget, setBudget] = useState(initialBudget)
   const [editingGoal, setEditingGoal] = useState(false)
   const [newGoal, setNewGoal] = useState(String(budget.goalAmount))

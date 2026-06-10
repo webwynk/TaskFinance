@@ -1,13 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, X, Users } from 'lucide-react'
+import { Plus, X } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { formatDate } from '@/lib/utils/formatDate'
 
 interface User {
   id: string; name: string; email: string; role: string; isActive: boolean
-  budgetGoal?: any; createdAt: Date
+  budgetGoal?: number | string | null; createdAt: Date
   _count: { tasks: number; financeEntries: number }
 }
 

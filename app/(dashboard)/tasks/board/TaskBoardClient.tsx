@@ -2,22 +2,22 @@
 
 import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
-import { Plus, LayoutList, Columns } from 'lucide-react'
+import { Plus, LayoutList } from 'lucide-react'
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd'
-import { resolveTaskStatus, PRIORITY_CONFIG, STATUS_CONFIG } from '@/lib/utils/taskStatus'
+import { resolveTaskStatus, PRIORITY_CONFIG } from '@/lib/utils/taskStatus'
 import { getDueDateLabel } from '@/lib/utils/formatDate'
 import toast from 'react-hot-toast'
 import TaskForm from '@/components/tasks/TaskForm'
+import { TaskStatus, Priority } from '@prisma/client'
 
 interface Task {
   id: string; title: string; description?: string | null; dueDate?: Date | null
-  dueTime?: string | null; priority: string; status: string; tags: string[]
+  dueTime?: string | null; priority: Priority; status: TaskStatus; tags: string[]
   completedAt?: Date | null; createdAt: Date; updatedAt: Date; userId: string
 }
 
 interface Props {
   initialTasks: Task[]
-  session: { user: { id: string; name: string; role: string } }
 }
 
 const COLUMNS = [
@@ -27,7 +27,7 @@ const COLUMNS = [
   { id: 'OVERDUE',     label: 'Overdue',     color: '#C94040', bg: '#FCDEDE', border: '#B83B3B' },
 ]
 
-export default function TaskBoardClient({ initialTasks, session }: Props) {
+export default function TaskBoardClient({ initialTasks }: Props) {
   const [tasks, setTasks] = useState<Task[]>(initialTasks)
   const [isMounted, setIsMounted] = useState(false)
   const [showForm, setShowForm] = useState(false)
@@ -42,7 +42,7 @@ export default function TaskBoardClient({ initialTasks, session }: Props) {
   const resolvedTasks = useMemo(() => {
     return tasks.map(t => ({
       ...t,
-      status: resolveTaskStatus(t as any)
+      status: resolveTaskStatus(t)
     }))
   }, [tasks])
 
@@ -188,7 +188,7 @@ export default function TaskBoardClient({ initialTasks, session }: Props) {
         <div>
           <h1 className="text-h1" style={{ color: 'var(--text-primary)' }}>Task Board</h1>
           <p className="text-caption" style={{ color: 'var(--text-tertiary)', marginTop: '2px' }}>
-            {tasks.length} total tasks • {tasks.filter(t => resolveTaskStatus(t as any) === 'COMPLETED').length} completed
+            {tasks.length} total tasks • {tasks.filter(t => resolveTaskStatus(t) === 'COMPLETED').length} completed
           </p>
         </div>
         <div style={{ display: 'flex', gap: '10px' }}>

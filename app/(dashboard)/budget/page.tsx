@@ -70,7 +70,6 @@ export default async function BudgetPage() {
       budget={{ goalAmount, spentAmount, month, year }}
       history={history}
       categoryBreakdown={categoryBreakdown}
-      isAdmin={session.user.role === 'ADMIN'}
     />
   )
 }

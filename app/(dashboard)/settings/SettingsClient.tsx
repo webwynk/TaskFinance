@@ -6,7 +6,7 @@ import { useAppStore } from '@/store/appStore'
 import toast from 'react-hot-toast'
 
 interface Props {
-  user: { name: string; email: string; role: string; budgetGoal?: any }
+  user: { name: string; email: string; role: string; budgetGoal?: number | string | null }
   session: { user: { id: string; role: string } }
 }
 
@@ -88,14 +88,6 @@ export default function SettingsClient({ user, session }: Props) {
     URL.revokeObjectURL(url)
     toast.success('Export downloaded!')
   }
-
-  const SECTIONS = [
-    { id: 'account', label: 'Account', icon: User },
-    { id: 'security', label: 'Security', icon: Lock },
-    { id: 'preferences', label: 'Preferences', icon: Palette },
-    { id: 'budget', label: 'Budget', icon: Target },
-    { id: 'data', label: 'Data', icon: Download },
-  ]
 
   const THEMES: Array<{ value: 'light' | 'dark' | 'system'; label: string; icon: typeof Sun }> = [
     { value: 'light', label: 'Light', icon: Sun },

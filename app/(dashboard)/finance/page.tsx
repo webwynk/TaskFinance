@@ -19,5 +19,5 @@ export default async function FinancePage() {
     prisma.financeCategory.findMany({ where: { isActive: true }, orderBy: { name: 'asc' } }),
   ])
 
-  return <FinanceClient initialEntries={entries} categories={categories} session={session} />
+  return <FinanceClient initialEntries={entries} categories={categories} />
 }

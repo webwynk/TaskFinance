@@ -1,28 +1,26 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { Plus, Filter } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils/formatCurrency'
-import { formatDate, formatDateTime } from '@/lib/utils/formatDate'
 import toast from 'react-hot-toast'
 import FinanceEntryForm from '@/components/finance/FinanceEntryForm'
 
 interface Entry {
   id: string; title: string; description?: string | null; itemName?: string | null
-  amount: any; type: string; date: Date; createdAt: Date
+  amount: number | string; type: string; date: Date; createdAt: Date
   category: { id: string; name: string; colorBg: string; colorText: string }
 }
 
 interface Props {
   initialEntries: Entry[]
   categories: Array<{ id: string; name: string; colorBg: string; colorText: string }>
-  session: { user: { id: string } }
 }
 
 const PERIOD_FILTERS = ['Today', 'This Week', 'This Month', 'All']
 const TYPE_FILTERS = ['All', 'Expense', 'Income']
 
-export default function FinanceClient({ initialEntries, categories, session }: Props) {
+export default function FinanceClient({ initialEntries, categories }: Props) {
   const [entries, setEntries] = useState(initialEntries)
   const [period, setPeriod] = useState('This Month')
   const [typeFilter, setTypeFilter] = useState('All')

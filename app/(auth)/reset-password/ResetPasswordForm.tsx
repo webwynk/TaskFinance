@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Eye, EyeOff, CheckSquare, Wallet, ArrowLeft, Check, Lock } from 'lucide-react'
+import { Eye, EyeOff, CheckSquare, Wallet, Check } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 const resetSchema = z.object({
@@ -89,8 +89,8 @@ export default function ResetPasswordForm() {
         },
       })
       setSuccess(true)
-    } catch (err: any) {
-      toast.error(err.message || 'Something went wrong', {
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Something went wrong', {
         style: {
           background: 'var(--color-rose)',
           color: 'var(--color-rose-deep)',

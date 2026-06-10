@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, X, Edit3, Check } from 'lucide-react'
+import { Plus, X } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 interface Category {
@@ -23,7 +23,6 @@ const COLOR_PRESETS = [
 export default function AdminCategoriesClient({ categories: initial }: Props) {
   const [categories, setCategories] = useState(initial)
   const [showCreate, setShowCreate] = useState(false)
-  const [editId, setEditId] = useState<string | null>(null)
   const [form, setForm] = useState({ name: '', colorBg: '#EAE4F7', colorText: '#7C5CBF', icon: '' })
   const [saving, setSaving] = useState(false)
 
