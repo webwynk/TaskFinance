@@ -19,9 +19,9 @@ interface Props {
     budgetRemaining: number
     budgetPercentage: number
   }
-  todayTasks: Array<{ id: string; title: string; status: string; dueDate?: Date | string | null; priority: string }>
-  todayEntries: Array<{ id: string; title: string; amount: number; type: string; category: { name: string; colorBg: string; colorText: string } }>
-  categories: Array<{ id: string; name: string; colorBg: string; colorText: string }>
+  todayTasks: any[]
+  todayEntries: any[]
+  categories: any[]
 }
 
 export default function DashboardClient({ session, stats, todayTasks, todayEntries, categories }: Props) {
@@ -231,8 +231,8 @@ export default function DashboardClient({ session, stats, todayTasks, todayEntri
               </div>
             ) : (
               tasks.map(task => {
-                const status = resolveTaskStatus(task)
-                const { label: dateLabel, variant } = getDueDateLabel(task.dueDate)
+                const status = resolveTaskStatus(task as any)
+                const { label: dateLabel, variant } = getDueDateLabel(task.dueDate ?? null)
                 return (
                   <div key={task.id} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 0', borderBottom: '1px solid var(--border-subtle)' }}>
                     {/* Priority dot */}

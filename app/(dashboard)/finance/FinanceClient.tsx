@@ -8,7 +8,7 @@ import FinanceEntryForm from '@/components/finance/FinanceEntryForm'
 
 interface Entry {
   id: string; title: string; description?: string | null; itemName?: string | null
-  amount: number | string; type: string; date: Date; createdAt: Date
+  amount: any; type: string; date: Date; createdAt: Date
   category: { id: string; name: string; colorBg: string; colorText: string }
 }
 

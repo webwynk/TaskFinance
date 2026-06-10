@@ -18,5 +18,5 @@ export default async function TaskBoardPage() {
 
   const resolved = tasks.map(t => ({ ...t, status: resolveTaskStatus(t) }))
 
-  return <TaskBoardClient initialTasks={resolved} session={session} />
+  return <TaskBoardClient initialTasks={resolved} />
 }

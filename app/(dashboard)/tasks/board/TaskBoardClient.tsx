@@ -42,7 +42,7 @@ export default function TaskBoardClient({ initialTasks }: Props) {
   const resolvedTasks = useMemo(() => {
     return tasks.map(t => ({
       ...t,
-      status: resolveTaskStatus(t)
+      status: resolveTaskStatus({ status: t.status, dueDate: t.dueDate ?? null, completedAt: t.completedAt ?? null })
     }))
   }, [tasks])
 
@@ -136,7 +136,7 @@ export default function TaskBoardClient({ initialTasks }: Props) {
       destination.index === source.index
     ) return
 
-    const newStatus = destination.droppableId
+    const newStatus = destination.droppableId as TaskStatus
     const taskToMove = tasks.find(t => t.id === draggableId)
     if (!taskToMove) return
 
@@ -188,7 +188,7 @@ export default function TaskBoardClient({ initialTasks }: Props) {
         <div>
           <h1 className="text-h1" style={{ color: 'var(--text-primary)' }}>Task Board</h1>
           <p className="text-caption" style={{ color: 'var(--text-tertiary)', marginTop: '2px' }}>
-            {tasks.length} total tasks • {tasks.filter(t => resolveTaskStatus(t) === 'COMPLETED').length} completed
+            {tasks.length} total tasks • {tasks.filter(t => resolveTaskStatus({ status: t.status, dueDate: t.dueDate ?? null, completedAt: t.completedAt ?? null }) === 'COMPLETED').length} completed
           </p>
         </div>
         <div style={{ display: 'flex', gap: '10px' }}>

@@ -7,7 +7,7 @@ import { formatDate } from '@/lib/utils/formatDate'
 
 interface User {
   id: string; name: string; email: string; role: string; isActive: boolean
-  budgetGoal?: number | string | null; createdAt: Date
+  budgetGoal?: any; createdAt: Date
   _count: { tasks: number; financeEntries: number }
 }
 

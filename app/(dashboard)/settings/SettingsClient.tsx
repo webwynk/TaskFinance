@@ -6,7 +6,7 @@ import { useAppStore } from '@/store/appStore'
 import toast from 'react-hot-toast'
 
 interface Props {
-  user: { name: string; email: string; role: string; budgetGoal?: number | string | null }
+  user: { name: string; email: string; role: string; budgetGoal?: any }
   session: { user: { id: string; role: string } }
 }
 

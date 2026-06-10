@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 import ResetPasswordForm from '@/app/(auth)/reset-password/ResetPasswordForm'
 
 export const metadata: Metadata = {
@@ -50,7 +51,11 @@ export default function ResetPasswordPage() {
         }}
       />
 
-      <ResetPasswordForm />
+      <Suspense fallback={
+        <div className="card animate-pulse" style={{ width: '100%', maxWidth: '420px', height: '400px' }} />
+      }>
+        <ResetPasswordForm />
+      </Suspense>
     </main>
   )
 }

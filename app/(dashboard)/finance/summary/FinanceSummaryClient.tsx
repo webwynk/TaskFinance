@@ -39,6 +39,7 @@ export default function FinanceSummaryClient({ initialSummary }: Props) {
   const [fromDate, setFromDate] = useState('')
   const [toDate, setToDate] = useState('')
   const [isMounted, setIsMounted] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   // Hydration guard
   useEffect(() => {
@@ -279,7 +280,7 @@ export default function FinanceSummaryClient({ initialSummary }: Props) {
                   <Tooltip
                     contentStyle={{ background: 'var(--bg-surface)', border: '1px solid var(--border-default)', borderRadius: '6px', fontSize: '12px' }}
                     labelStyle={{ fontWeight: 600, color: 'var(--text-primary)' }}
-                    formatter={(val: number | string | boolean) => [formatCurrency(Number(val)), 'Spent']}
+                    formatter={(val: any) => [formatCurrency(Number(val)), 'Spent']}
                   />
                   <Bar dataKey="amount" fill="var(--color-rose-deep)" radius={[4, 4, 0, 0]} />
                 </BarChart>
@@ -313,7 +314,7 @@ export default function FinanceSummaryClient({ initialSummary }: Props) {
                     </Pie>
                     <Tooltip
                       contentStyle={{ background: 'var(--bg-surface)', border: '1px solid var(--border-default)', borderRadius: '6px', fontSize: '12px' }}
-                      formatter={(val: number | string | boolean) => [formatCurrency(Number(val)), 'Total']}
+                      formatter={(val: any) => [formatCurrency(Number(val)), 'Total']}
                     />
                     <Legend
                       verticalAlign="bottom"
@@ -336,7 +337,7 @@ export default function FinanceSummaryClient({ initialSummary }: Props) {
                 <YAxis tick={{ fill: 'var(--text-secondary)', fontSize: '11px' }} axisLine={false} tickLine={false} />
                 <Tooltip
                   contentStyle={{ background: 'var(--bg-surface)', border: '1px solid var(--border-default)', borderRadius: '6px', fontSize: '12px' }}
-                  formatter={(val: number | string | boolean) => [formatCurrency(Number(val)), '']}
+                  formatter={(val: any) => [formatCurrency(Number(val)), '']}
                 />
                 <Bar dataKey="Income" fill="var(--color-mint-deep)" radius={[4, 4, 0, 0]} maxBarSize={60} />
                 <Bar dataKey="Expenses" fill="var(--color-rose-deep)" radius={[4, 4, 0, 0]} maxBarSize={60} />
