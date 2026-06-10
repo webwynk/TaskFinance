@@ -1,0 +1,132 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  password      String
+  role          Role      @default(USER)
+  isActive      Boolean   @default(true)
+  budgetGoal    Decimal?  @db.Decimal(10, 2)
+  resetToken    String?
+  resetTokenExp DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  tasks          Task[]
+  financeEntries FinanceEntry[]
+  budgetHistory  BudgetRecord[]
+
+  @@map("users")
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+model Task {
+  id          String     @id @default(cuid())
+  userId      String
+  title       String     @db.VarChar(120)
+  description String?    @db.VarChar(500)
+  dueDate     DateTime?
+  dueTime     String?
+  priority    Priority   @default(MEDIUM)
+  status      TaskStatus @default(PENDING)
+  tags        String[]
+  completedAt DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+  @@index([userId, dueDate])
+  @@map("tasks")
+}
+
+enum Priority {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  OVERDUE
+}
+
+model FinanceCategory {
+  id        String   @id @default(cuid())
+  name      String   @db.VarChar(60)
+  colorBg   String   @db.VarChar(7)
+  colorText String   @db.VarChar(7)
+  icon      String?  @db.VarChar(40)
+  isActive  Boolean  @default(true)
+  createdBy String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  entries FinanceEntry[]
+
+  @@map("finance_categories")
+}
+
+model FinanceEntry {
+  id          String      @id @default(cuid())
+  userId      String
+  categoryId  String
+  title       String      @db.VarChar(100)
+  description String?     @db.VarChar(300)
+  itemName    String?     @db.VarChar(80)
+  amount      Decimal     @db.Decimal(10, 2)
+  type        EntryType   @default(EXPENSE)
+  date        DateTime    @db.Date
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category FinanceCategory @relation(fields: [categoryId], references: [id])
+
+  @@index([userId, date])
+  @@index([userId, categoryId])
+  @@map("finance_entries")
+}
+
+enum EntryType {
+  EXPENSE
+  INCOME
+}
+
+model BudgetRecord {
+  id          String   @id @default(cuid())
+  userId      String
+  month       Int
+  year        Int
+  goalAmount  Decimal  @db.Decimal(10, 2)
+  spentAmount Decimal  @db.Decimal(10, 2) @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, month, year])
+  @@map("budget_records")
+}
+
+model AppSettings {
+  id                String   @id @default(cuid())
+  defaultBudgetGoal Decimal? @db.Decimal(10, 2)
+  updatedAt         DateTime @updatedAt
+
+  @@map("app_settings")
+}
