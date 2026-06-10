@@ -70,7 +70,7 @@ export default function DashboardShell({ children, session }: DashboardShellProp
       <BottomNav session={session} />
 
       {/* Responsive overrides */}
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 1279px) {
           .dashboard-main { margin-left: 64px !important; }
         }
@@ -78,7 +78,7 @@ export default function DashboardShell({ children, session }: DashboardShellProp
           .dashboard-main { margin-left: 0 !important; }
           .dashboard-content { padding: 16px !important; padding-bottom: 80px !important; }
         }
-      `}</style>
+      ` }} />
     </div>
   )
 }

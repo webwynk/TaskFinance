@@ -216,9 +216,9 @@ export default function FinanceClient({ initialEntries, categories, session }: P
         />
       )}
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         .entry-row:hover .entry-actions { opacity: 1 !important; }
-      `}</style>
+      ` }} />
     </div>
   )
 }

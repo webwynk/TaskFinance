@@ -197,9 +197,9 @@ export default function Sidebar({ session }: SidebarProps) {
       </div>
 
       {/* Hide on mobile */}
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 767px) { .sidebar-desktop { display: none !important; } }
-      `}</style>
+      ` }} />
     </aside>
   )
 }

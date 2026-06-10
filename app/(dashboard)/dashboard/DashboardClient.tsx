@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { CheckSquare, Wallet, Target, Plus, ArrowRight, TrendingDown, TrendingUp } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils/formatCurrency'
@@ -33,6 +33,17 @@ export default function DashboardClient({ session, stats, todayTasks, todayEntri
   const [entries, setEntries] = useState(todayEntries)
   const [creatingTask, setCreatingTask] = useState(false)
   const [creatingEntry, setCreatingEntry] = useState(false)
+
+  // Hydration safety for local date/time
+  const [greeting, setGreeting] = useState('day')
+  const [formattedDate, setFormattedDate] = useState('')
+
+  useEffect(() => {
+    const hours = new Date().getHours()
+    const greet = hours < 12 ? 'morning' : hours < 18 ? 'afternoon' : 'evening'
+    setGreeting(greet)
+    setFormattedDate(new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }))
+  }, [])
 
   const budgetPct = Math.min(stats.budgetPercentage, 110)
   const budgetStatus = budgetPct <= 60 ? 'on-track' : budgetPct <= 80 ? 'watch' : budgetPct <= 100 ? 'near' : 'over'
@@ -107,11 +118,13 @@ export default function DashboardClient({ session, stats, todayTasks, todayEntri
       {/* Greeting */}
       <div style={{ marginBottom: '24px' }}>
         <h1 className="text-display" style={{ color: 'var(--text-primary)' }}>
-          Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 18 ? 'afternoon' : 'evening'}, {session.user.name.split(' ')[0]} 👋
+          Good {greeting}, {session.user.name.split(' ')[0]} 👋
         </h1>
-        <p style={{ color: 'var(--text-tertiary)', fontSize: '14px', marginTop: '4px' }}>
-          {new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
-        </p>
+        {formattedDate && (
+          <p style={{ color: 'var(--text-tertiary)', fontSize: '14px', marginTop: '4px' }}>
+            {formattedDate}
+          </p>
+        )}
       </div>
 
       {/* Stat Cards Strip */}
@@ -341,13 +354,13 @@ export default function DashboardClient({ session, stats, todayTasks, todayEntri
         </div>
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 1024px) { .dashboard-grid { grid-template-columns: 1fr !important; } }
         @media (max-width: 640px) {
           .dashboard-grid > div:first-child { display: block; }
           [style*="gridTemplateColumns: 'repeat(3, 1fr'"] { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </div>
   )
 }

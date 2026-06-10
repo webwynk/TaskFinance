@@ -88,9 +88,9 @@ export default function BottomNav({ session }: BottomNavProps) {
         <span>More</span>
       </Link>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (min-width: 768px) { .bottom-nav { display: none !important; } }
-      `}</style>
+      ` }} />
     </nav>
   )
 }
