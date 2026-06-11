@@ -10,6 +10,14 @@ const nextConfig = {
       { protocol: 'https', hostname: '**.supabase.co' },
     ],
   },
+  webpack: (config) => {
+    config.ignoreWarnings = [
+      { module: /node_modules\/jose/ },
+      { message: /CompressionStream/ },
+      { message: /DecompressionStream/ },
+    ];
+    return config;
+  },
 }
 
 export default nextConfig
