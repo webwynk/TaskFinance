@@ -151,33 +151,35 @@ export default function BudgetClient({ budget: initialBudget, history, categoryB
       {history.length > 0 && (
         <div className="card">
           <h2 className="text-h3" style={{ color: 'var(--text-primary)', marginBottom: '20px' }}>Historical Performance</h2>
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Month</th>
-                <th>Goal</th>
-                <th>Spent</th>
-                <th>% Used</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {history.map(h => {
-                const p = Number(h.goalAmount) > 0 ? (Number(h.spentAmount) / Number(h.goalAmount)) * 100 : 0
-                const st = p <= 60 ? '✓ On track' : p <= 80 ? '⚠ Watch' : p <= 100 ? '🔶 Near limit' : '🚨 Over budget'
-                const sc = p <= 60 ? 'var(--color-mint-deep)' : p <= 80 ? 'var(--color-lemon-deep)' : p <= 100 ? 'var(--color-peach-deep)' : 'var(--color-rose-deep)'
-                return (
-                  <tr key={`${h.year}-${h.month}`}>
-                    <td style={{ fontWeight: 500 }}>{formatMonthYear(h.month, h.year)}</td>
-                    <td>{formatCurrency(Number(h.goalAmount))}</td>
-                    <td>{formatCurrency(Number(h.spentAmount))}</td>
-                    <td style={{ fontWeight: 600, color: sc }}>{Math.round(p)}%</td>
-                    <td><span style={{ color: sc, fontSize: '13px' }}>{st}</span></td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
+          <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Month</th>
+                  <th>Goal</th>
+                  <th>Spent</th>
+                  <th>% Used</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {history.map(h => {
+                  const p = Number(h.goalAmount) > 0 ? (Number(h.spentAmount) / Number(h.goalAmount)) * 100 : 0
+                  const st = p <= 60 ? '✓ On track' : p <= 80 ? '⚠ Watch' : p <= 100 ? '🔶 Near limit' : '🚨 Over budget'
+                  const sc = p <= 60 ? 'var(--color-mint-deep)' : p <= 80 ? 'var(--color-lemon-deep)' : p <= 100 ? 'var(--color-peach-deep)' : 'var(--color-rose-deep)'
+                  return (
+                    <tr key={`${h.year}-${h.month}`}>
+                      <td style={{ fontWeight: 500 }}>{formatMonthYear(h.month, h.year)}</td>
+                      <td>{formatCurrency(Number(h.goalAmount))}</td>
+                      <td>{formatCurrency(Number(h.spentAmount))}</td>
+                      <td style={{ fontWeight: 600, color: sc }}>{Math.round(p)}%</td>
+                      <td><span style={{ color: sc, fontSize: '13px' }}>{st}</span></td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>

@@ -57,7 +57,7 @@ export default function FinanceEntryForm({ entry, categories, onClose, onSaved }
 
   return (
     <div className="modal-backdrop" onClick={e => { if (e.target === e.currentTarget) onClose() }} role="dialog" aria-modal="true">
-      <div className="modal-content animate-scale-in">
+      <div className="modal-content">
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
           <h2 className="text-h2" style={{ color: 'var(--text-primary)' }}>{isEdit ? 'Edit Entry' : 'Add Finance Entry'}</h2>
           <button className="btn btn-ghost btn-icon" onClick={onClose} aria-label="Close"><X size={18} /></button>

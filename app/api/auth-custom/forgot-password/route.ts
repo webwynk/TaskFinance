@@ -36,15 +36,11 @@ export async function POST(req: NextRequest) {
 
     const resetUrl = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/reset-password?token=${rawToken}`
 
-    // Log the link for local development
-    console.log('\n=======================================')
-    console.log(`PASSWORD RESET REQUEST FOR: ${email}`)
-    console.log(`Reset Link: ${resetUrl}`)
-    console.log('=======================================\n')
+    // TODO: Send email with resetUrl via your email provider
+    // e.g. sendEmail({ to: email, subject: 'Reset your password', body: resetUrl })
 
     return NextResponse.json({
-      message: 'If the email is registered, a reset link has been generated.',
-      link: resetUrl, // Include in response for easy local testing
+      message: 'If the email is registered, a reset link has been sent.',
     })
   } catch (error) {
     console.error('Forgot password error:', error)

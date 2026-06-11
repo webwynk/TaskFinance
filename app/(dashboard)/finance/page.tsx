@@ -14,7 +14,7 @@ export default async function FinancePage() {
       where: { userId: session.user.id },
       include: { category: true },
       orderBy: [{ date: 'desc' }, { createdAt: 'desc' }],
-      take: 50,
+      take: 1000,
     }),
     prisma.financeCategory.findMany({ where: { isActive: true }, orderBy: { name: 'asc' } }),
   ])

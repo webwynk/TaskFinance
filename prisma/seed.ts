@@ -1,7 +1,20 @@
 import { PrismaClient } from '@prisma/client'
+import { Pool } from 'pg'
+import { PrismaPg } from '@prisma/adapter-pg'
+import dotenv from 'dotenv'
 import bcrypt from 'bcryptjs'
 
-const prisma = new PrismaClient()
+// Load environment variables
+dotenv.config({ path: '.env.local' })
+
+const connectionString = process.env.DATABASE_URL
+if (!connectionString) {
+  throw new Error('DATABASE_URL is not set in .env.local')
+}
+
+const pool = new Pool({ connectionString })
+const adapter = new PrismaPg(pool)
+const prisma = new PrismaClient({ adapter })
 
 const CATEGORY_SEED = [
   { name: 'Food & Dining',      colorBg: '#FDE8DF', colorText: '#B04D25', icon: 'UtensilsCrossed' },
@@ -89,4 +102,7 @@ async function main() {
 
 main()
   .catch((e) => { console.error('❌ Seed error:', e); process.exit(1) })
-  .finally(async () => { await prisma.$disconnect() })
+  .finally(async () => {
+    await prisma.$disconnect()
+    await pool.end()
+  })

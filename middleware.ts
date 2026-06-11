@@ -10,7 +10,7 @@ export default auth((req) => {
   const isAdmin = session?.user?.role === 'ADMIN'
 
   const isAuthPage = nextUrl.pathname.startsWith('/login')
-  const isApiAuthPage = nextUrl.pathname.startsWith('/api/auth')
+  const isApiAuthPage = nextUrl.pathname.startsWith('/api/auth') || nextUrl.pathname.startsWith('/api/auth-custom')
   const isAdminPage =
     nextUrl.pathname.startsWith('/admin') ||
     nextUrl.pathname.startsWith('/api/users') ||

@@ -82,7 +82,7 @@ export default function TaskForm({ task, onClose, onSaved }: Props) {
 
   return (
     <div className="modal-backdrop" onClick={e => { if (e.target === e.currentTarget) onClose() }} role="dialog" aria-modal="true" aria-label={isEdit ? 'Edit task' : 'Create task'}>
-      <div className="modal-content animate-scale-in">
+      <div className="modal-content">
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
           <h2 className="text-h2" style={{ color: 'var(--text-primary)' }}>{isEdit ? 'Edit Task' : 'New Task'}</h2>

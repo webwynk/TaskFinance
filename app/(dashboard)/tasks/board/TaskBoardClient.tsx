@@ -312,7 +312,6 @@ export default function TaskBoardClient({ initialTasks }: Props) {
                                     background: 'var(--bg-surface)',
                                     borderRadius: 'var(--radius-md)',
                                     border: '1px solid var(--border-default)',
-                                    borderLeft: `3px solid ${priorityConf?.color ?? 'transparent'}`,
                                     boxShadow: snapshot.isDragging ? 'var(--shadow-lg)' : 'var(--shadow-sm)',
                                     cursor: 'grab',
                                     transition: 'box-shadow 150ms ease, border-color 150ms ease',
@@ -373,6 +372,11 @@ export default function TaskBoardClient({ initialTasks }: Props) {
 
                                   {/* Chips & Metadata */}
                                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginBottom: '8px' }}>
+                                    {priorityConf && (
+                                      <span className="chip" style={{ background: priorityConf.bg, color: priorityConf.color, fontSize: '9px', height: '16px', padding: '0 6px', fontWeight: 600 }}>
+                                        {task.priority.toUpperCase()}
+                                      </span>
+                                    )}
                                     {task.tags.map(t => (
                                       <span key={t} className="chip" style={{ background: 'var(--bg-input)', color: 'var(--text-secondary)', fontSize: '9px', height: '16px', padding: '0 6px' }}>
                                         {t}

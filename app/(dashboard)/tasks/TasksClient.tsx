@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import Link from 'next/link'
 import { Plus, LayoutList, Columns, X } from 'lucide-react'
 import { resolveTaskStatus, PRIORITY_CONFIG, STATUS_CONFIG } from '@/lib/utils/taskStatus'
@@ -31,6 +31,14 @@ export default function TasksClient({ initialTasks, session }: Props) {
   const [search, setSearch] = useState('')
   const [showForm, setShowForm] = useState(false)
   const [editTask, setEditTask] = useState<Task | null>(null)
+  
+  const [currentPage, setCurrentPage] = useState(1)
+  const ITEMS_PER_PAGE = 10
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [period, statusFilter, priorityFilter, search])
 
   const filtered = useMemo(() => {
     const now = new Date()
@@ -59,6 +67,12 @@ export default function TasksClient({ initialTasks, session }: Props) {
       return true
     })
   }, [tasks, period, statusFilter, priorityFilter, search])
+
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE)
+  const paginatedTasks = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE
+    return filtered.slice(start, start + ITEMS_PER_PAGE)
+  }, [filtered, currentPage])
 
   const toggleTask = async (taskId: string, currentStatus: string) => {
     const newStatus = currentStatus === 'COMPLETED' ? 'PENDING' : 'COMPLETED'
@@ -146,91 +160,116 @@ export default function TasksClient({ initialTasks, session }: Props) {
           </button>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-          {filtered.map(task => {
-            const status = resolveTaskStatus(task as any)
-            const { label: dateLabel, variant } = getDueDateLabel(task.dueDate ?? null)
-            const priorityConf = PRIORITY_CONFIG[task.priority as keyof typeof PRIORITY_CONFIG]
+        <>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {paginatedTasks.map(task => {
+              const status = resolveTaskStatus(task as any)
+              const { label: dateLabel, variant } = getDueDateLabel(task.dueDate ?? null)
+              const priorityConf = PRIORITY_CONFIG[task.priority as keyof typeof PRIORITY_CONFIG]
 
-            return (
-              <div
-                key={task.id}
-                className="card"
-                style={{ padding: '14px 20px', display: 'flex', alignItems: 'center', gap: '14px', borderLeft: `3px solid ${priorityConf?.color ?? 'transparent'}` }}
-              >
-                {/* Priority dot */}
-                <div className={`priority-dot priority-dot-${task.priority.toLowerCase()}`} style={{ flexShrink: 0 }} />
-
-                {/* Checkbox */}
-                <button
-                  onClick={() => toggleTask(task.id, status)}
-                  style={{
-                    width: '20px', height: '20px', borderRadius: '5px', flexShrink: 0,
-                    border: status === 'COMPLETED' ? 'none' : '2px solid var(--border-default)',
-                    background: status === 'COMPLETED' ? 'var(--color-lavender-deep)' : 'transparent',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    cursor: 'pointer', transition: 'all 200ms ease',
-                  }}
-                  aria-label={status === 'COMPLETED' ? 'Mark incomplete' : 'Mark complete'}
-                >
-                  {status === 'COMPLETED' && (
-                    <svg width="11" height="8" viewBox="0 0 11 8" fill="none">
-                      <path d="M1 3.5L4 6.5L10 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  )}
-                </button>
-
-                {/* Content */}
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{
-                    fontSize: '14px', fontWeight: 500,
-                    color: status === 'COMPLETED' ? 'var(--text-tertiary)' : 'var(--text-primary)',
-                    textDecoration: status === 'COMPLETED' ? 'line-through' : 'none',
-                    overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis',
-                  }}>
-                    {task.title}
-                  </p>
-                  {task.description && (
-                    <p style={{ fontSize: '12px', color: 'var(--text-tertiary)', marginTop: '2px', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
-                      {task.description}
-                    </p>
-                  )}
-                  {task.tags.length > 0 && (
-                    <div style={{ display: 'flex', gap: '4px', marginTop: '4px', flexWrap: 'wrap' }}>
-                      {task.tags.map(tag => (
-                        <span key={tag} className="chip" style={{ background: 'var(--bg-input)', color: 'var(--text-secondary)', fontSize: '10px', height: '18px' }}>
-                          {tag}
-                        </span>
-                      ))}
+              return (
+                <div key={task.id} className="task-card card animate-fade-in">
+                  <div className="task-card-main">
+                    {/* Checkbox */}
+                    <div className="task-checkbox-container">
+                      <button
+                        onClick={() => toggleTask(task.id, status)}
+                        style={{
+                          width: '20px', height: '20px', borderRadius: '5px',
+                          border: status === 'COMPLETED' ? 'none' : '2px solid var(--border-default)',
+                          background: status === 'COMPLETED' ? 'var(--color-lavender-deep)' : 'transparent',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          cursor: 'pointer', transition: 'all 200ms ease',
+                        }}
+                        aria-label={status === 'COMPLETED' ? 'Mark incomplete' : 'Mark complete'}
+                      >
+                        {status === 'COMPLETED' && (
+                          <svg width="11" height="8" viewBox="0 0 11 8" fill="none">
+                            <path d="M1 3.5L4 6.5L10 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        )}
+                      </button>
                     </div>
-                  )}
+
+                    {/* Title, Description & Tags */}
+                    <div className="task-info">
+                      <h3 className={`task-title ${status === 'COMPLETED' ? 'completed' : ''}`}>
+                        {task.title}
+                      </h3>
+                      {task.description && (
+                        <p className="task-description">{task.description}</p>
+                      )}
+                      {task.tags.length > 0 && (
+                        <div className="task-tags">
+                          {task.tags.map(tag => (
+                            <span key={tag} className="chip tag-chip">
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Badges & Actions */}
+                  <div className="task-card-meta">
+                    <div className="task-badges">
+                      {/* Priority chip */}
+                      <span className="chip" style={{ background: priorityConf?.bg, color: priorityConf?.color }}>
+                        {task.priority.toUpperCase()}
+                      </span>
+                      {/* Status chip */}
+                      <span className="chip" style={{ background: STATUS_CONFIG[status as keyof typeof STATUS_CONFIG]?.bg, color: STATUS_CONFIG[status as keyof typeof STATUS_CONFIG]?.color }}>
+                        {STATUS_CONFIG[status as keyof typeof STATUS_CONFIG]?.label}
+                      </span>
+                      {/* Due date chip */}
+                      {variant && (
+                        <span className={`chip chip-${variant}`}>
+                          {dateLabel}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Action buttons */}
+                    <div className="task-actions">
+                      <button className="btn btn-ghost btn-icon" style={{ width: '30px', height: '30px' }} onClick={() => { setEditTask(task); setShowForm(true) }} aria-label="Edit task">
+                        ✏️
+                      </button>
+                      <button className="btn btn-ghost btn-icon" style={{ width: '30px', height: '30px' }} onClick={() => deleteTask(task.id)} aria-label="Delete task">
+                        🗑️
+                      </button>
+                    </div>
+                  </div>
                 </div>
+              )
+            })}
+          </div>
 
-                {/* Status badge */}
-                <span className="chip" style={{ background: STATUS_CONFIG[status as keyof typeof STATUS_CONFIG]?.bg, color: STATUS_CONFIG[status as keyof typeof STATUS_CONFIG]?.color, flexShrink: 0 }}>
-                  {STATUS_CONFIG[status as keyof typeof STATUS_CONFIG]?.label}
-                </span>
-
-                {/* Due date chip */}
-                {variant && (
-                  <span className={`chip chip-${variant}`} style={{ flexShrink: 0 }}>
-                    {dateLabel}
-                  </span>
-                )}
-
-                {/* Actions */}
-                <div style={{ display: 'flex', gap: '4px', flexShrink: 0 }}>
-                  <button className="btn btn-ghost btn-icon" style={{ width: '30px', height: '30px' }} onClick={() => { setEditTask(task); setShowForm(true) }} aria-label="Edit task">
-                    ✏️
-                  </button>
-                  <button className="btn btn-ghost btn-icon" style={{ width: '30px', height: '30px' }} onClick={() => deleteTask(task.id)} aria-label="Delete task">
-                    🗑️
-                  </button>
-                </div>
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="pagination-container">
+              <span className="pagination-info">
+                Showing {Math.min(filtered.length, (currentPage - 1) * ITEMS_PER_PAGE + 1)}-{Math.min(filtered.length, currentPage * ITEMS_PER_PAGE)} of {filtered.length} tasks
+              </span>
+              <div className="pagination-btn-group">
+                <button
+                  className="pagination-btn"
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                >
+                  Previous
+                </button>
+                <button
+                  className="pagination-btn"
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                >
+                  Next
+                </button>
               </div>
-            )
-          })}
-        </div>
+            </div>
+          )}
+        </>
       )}
 
       {/* Task Form Modal */}

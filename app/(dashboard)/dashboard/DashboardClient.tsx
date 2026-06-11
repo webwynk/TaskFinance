@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
-import { CheckSquare, Wallet, Target, Plus, ArrowRight, TrendingDown } from 'lucide-react'
+import { CheckSquare, Wallet, Target, Plus, ArrowRight, TrendingDown, X, AlignLeft, Calendar, Flag } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils/formatCurrency'
 import { resolveTaskStatus } from '@/lib/utils/taskStatus'
 import { getDueDateLabel } from '@/lib/utils/formatDate'
@@ -25,14 +25,22 @@ interface Props {
 }
 
 export default function DashboardClient({ session, stats, todayTasks, todayEntries, categories }: Props) {
-  const [newTaskTitle, setNewTaskTitle] = useState('')
+  // Finance quick-add state
   const [quickAmount, setQuickAmount] = useState('')
   const [quickTitle, setQuickTitle] = useState('')
   const [quickCategory, setQuickCategory] = useState('')
   const [tasks, setTasks] = useState(todayTasks)
   const [entries, setEntries] = useState(todayEntries)
-  const [creatingTask, setCreatingTask] = useState(false)
   const [creatingEntry, setCreatingEntry] = useState(false)
+
+  // Task creation popup state
+  const [showTaskPopup, setShowTaskPopup] = useState(false)
+  const [popupTitle, setPopupTitle] = useState('')
+  const [popupDesc, setPopupDesc] = useState('')
+  const [popupPriority, setPopupPriority] = useState<'LOW'|'MEDIUM'|'HIGH'|'URGENT'>('MEDIUM')
+  const [popupDueDate, setPopupDueDate] = useState(new Date().toISOString().split('T')[0])
+  const [creatingTask, setCreatingTask] = useState(false)
+  const popupTitleRef = useRef<HTMLInputElement>(null)
 
   // Hydration safety for local date/time
   const [greeting, setGreeting] = useState('day')
@@ -51,25 +59,58 @@ export default function DashboardClient({ session, stats, todayTasks, todayEntri
   const budgetColor = { 'on-track': 'var(--color-mint-deep)', watch: 'var(--color-lemon-deep)', near: 'var(--color-peach-deep)', over: 'var(--color-rose-deep)' }[budgetStatus]
   const budgetBarClass = { 'on-track': 'progress-fill-on-track', watch: 'progress-fill-watch', near: 'progress-fill-near', over: 'progress-fill-over' }[budgetStatus]
 
-  const addTask = async (e: React.KeyboardEvent) => {
-    if (e.key !== 'Enter' || !newTaskTitle.trim()) return
+  const openTaskPopup = useCallback(() => {
+    setPopupTitle('')
+    setPopupDesc('')
+    setPopupPriority('MEDIUM')
+    setPopupDueDate(new Date().toISOString().split('T')[0])
+    setShowTaskPopup(true)
+    // Focus the title input after mount
+    setTimeout(() => popupTitleRef.current?.focus(), 80)
+  }, [])
+
+  const closeTaskPopup = useCallback(() => {
+    setShowTaskPopup(false)
+  }, [])
+
+  const createTaskFromPopup = async () => {
+    if (!popupTitle.trim()) {
+      toast.error('Task title is required')
+      popupTitleRef.current?.focus()
+      return
+    }
     setCreatingTask(true)
     try {
       const res = await fetch('/api/tasks', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: newTaskTitle.trim(), priority: 'MEDIUM', dueDate: new Date().toISOString().split('T')[0] }),
+        body: JSON.stringify({
+          title: popupTitle.trim(),
+          description: popupDesc.trim() || undefined,
+          priority: popupPriority,
+          dueDate: popupDueDate,
+        }),
       })
       if (res.ok) {
         const { data } = await res.json()
         setTasks(prev => [data, ...prev])
-        setNewTaskTitle('')
-        toast.success('Task added!', { style: { background: 'var(--color-mint)', color: 'var(--color-mint-deep)' } })
+        setShowTaskPopup(false)
+        toast.success('Task created!', { style: { background: 'var(--color-mint)', color: 'var(--color-mint-deep)' } })
+      } else {
+        toast.error('Failed to create task')
       }
     } finally {
       setCreatingTask(false)
     }
   }
+
+  // Close popup on Escape key
+  useEffect(() => {
+    if (!showTaskPopup) return
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') closeTaskPopup() }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [showTaskPopup, closeTaskPopup])
 
   const toggleTask = async (taskId: string, currentStatus: string) => {
     const newStatus = currentStatus === 'COMPLETED' ? 'PENDING' : 'COMPLETED'
@@ -128,7 +169,7 @@ export default function DashboardClient({ session, stats, todayTasks, todayEntri
       </div>
 
       {/* Stat Cards Strip */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '28px' }}>
+      <div className="stats-grid">
         {/* Tasks stat */}
         <div className="card" style={{ padding: '20px' }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '12px' }}>
@@ -200,26 +241,30 @@ export default function DashboardClient({ session, stats, todayTasks, todayEntri
                 </span>
               )}
             </div>
-            <Link href="/tasks" style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: 'var(--color-lavender-deep)', textDecoration: 'none', fontWeight: 500 }}>
-              View all <ArrowRight size={14} />
-            </Link>
-          </div>
-
-          {/* Quick add */}
-          <div style={{ padding: '12px 24px', borderBottom: '1px solid var(--border-subtle)', display: 'flex', gap: '10px' }}>
-            <input
-              className="input"
-              style={{ height: '40px', flex: 1 }}
-              placeholder="Add a task… press Enter"
-              value={newTaskTitle}
-              onChange={e => setNewTaskTitle(e.target.value)}
-              onKeyDown={addTask}
-              disabled={creatingTask}
-              id="quick-add-task"
-            />
-            <button className="btn btn-secondary btn-icon" aria-label="Add task" title="Press Enter in the field">
-              <Plus size={16} />
-            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <button
+                id="dashboard-add-task-btn"
+                onClick={openTaskPopup}
+                aria-label="Create new task"
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '6px',
+                  height: '34px', padding: '0 14px',
+                  background: 'var(--color-lavender-deep)', color: '#fff',
+                  border: 'none', borderRadius: 'var(--radius-md)',
+                  fontSize: '13px', fontWeight: 600, cursor: 'pointer',
+                  boxShadow: '0 2px 8px rgba(124,92,191,0.28)',
+                  transition: 'all var(--transition-fast)',
+                }}
+                onMouseEnter={e => (e.currentTarget.style.background = '#6344a8')}
+                onMouseLeave={e => (e.currentTarget.style.background = 'var(--color-lavender-deep)')}
+              >
+                <Plus size={15} />
+                New Task
+              </button>
+              <Link href="/tasks" style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: 'var(--text-tertiary)', textDecoration: 'none', fontWeight: 500 }}>
+                View all <ArrowRight size={14} />
+              </Link>
+            </div>
           </div>
 
           {/* Task list */}
@@ -265,6 +310,19 @@ export default function DashboardClient({ session, stats, todayTasks, todayEntri
                       }}>
                         {task.title}
                       </p>
+                      {task.description && (
+                        <p style={{
+                          fontSize: '12px',
+                          color: 'var(--text-secondary)',
+                          marginTop: '2px',
+                          overflow: 'hidden',
+                          whiteSpace: 'nowrap',
+                          textOverflow: 'ellipsis',
+                          textDecoration: status === 'COMPLETED' ? 'line-through' : 'none',
+                        }}>
+                          {task.description}
+                        </p>
+                      )}
                     </div>
                     {/* Due date chip */}
                     {variant && (
@@ -358,9 +416,129 @@ export default function DashboardClient({ session, stats, todayTasks, todayEntri
         @media (max-width: 1024px) { .dashboard-grid { grid-template-columns: 1fr !important; } }
         @media (max-width: 640px) {
           .dashboard-grid > div:first-child { display: block; }
-          [style*="gridTemplateColumns: 'repeat(3, 1fr'"] { grid-template-columns: 1fr !important; }
         }
       ` }} />
+
+      {/* ── Task Creation Popup ── */}
+      {showTaskPopup && (
+        <div
+          className="task-popup-overlay"
+          onClick={e => { if (e.target === e.currentTarget) closeTaskPopup() }}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="popup-title"
+        >
+          <div className="task-popup-card">
+            {/* Header */}
+            <div className="task-popup-header">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{ width: '32px', height: '32px', background: 'var(--color-lavender)', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <CheckSquare size={16} color="var(--color-lavender-deep)" />
+                </div>
+                <span className="task-popup-title" id="popup-title">New Task</span>
+              </div>
+              <button className="task-popup-close" onClick={closeTaskPopup} aria-label="Close">
+                <X size={16} />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="task-popup-body">
+              {/* Title */}
+              <div>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                  <Flag size={11} /> Title
+                </label>
+                <input
+                  ref={popupTitleRef}
+                  id="popup-task-title"
+                  className="input"
+                  style={{ height: '42px', fontSize: '15px', fontWeight: 500 }}
+                  placeholder="What needs to be done?"
+                  value={popupTitle}
+                  onChange={e => setPopupTitle(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) createTaskFromPopup() }}
+                />
+              </div>
+
+              {/* Description */}
+              <div>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                  <AlignLeft size={11} /> Description <span style={{ fontWeight: 400, color: 'var(--text-tertiary)', textTransform: 'none', fontSize: '11px' }}>(optional)</span>
+                </label>
+                <textarea
+                  id="popup-task-desc"
+                  className="input"
+                  style={{ height: '72px', resize: 'none', fontSize: '13px', lineHeight: 1.5, paddingTop: '10px' }}
+                  placeholder="Add a short description…"
+                  value={popupDesc}
+                  onChange={e => setPopupDesc(e.target.value)}
+                />
+              </div>
+
+              {/* Priority */}
+              <div>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '8px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                  Priority
+                </label>
+                <div className="priority-toggle-group">
+                  {(['LOW', 'MEDIUM', 'HIGH', 'URGENT'] as const).map(p => (
+                    <button
+                      key={p}
+                      className="priority-toggle-btn"
+                      data-active={popupPriority === p ? 'true' : 'false'}
+                      data-p={p}
+                      onClick={() => setPopupPriority(p)}
+                      type="button"
+                    >
+                      {p === 'LOW' ? '🟢 Low' : p === 'MEDIUM' ? '🟡 Medium' : p === 'HIGH' ? '🟠 High' : '🔴 Urgent'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Due Date */}
+              <div>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                  <Calendar size={11} /> Due Date
+                </label>
+                <input
+                  id="popup-task-due"
+                  className="input"
+                  type="date"
+                  style={{ height: '40px' }}
+                  value={popupDueDate}
+                  onChange={e => setPopupDueDate(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="task-popup-footer">
+              <button
+                className="btn btn-secondary"
+                onClick={closeTaskPopup}
+                style={{ height: '38px', padding: '0 18px', fontSize: '13px' }}
+              >
+                Cancel
+              </button>
+              <button
+                id="popup-create-task-btn"
+                className="btn btn-primary"
+                onClick={createTaskFromPopup}
+                disabled={creatingTask || !popupTitle.trim()}
+                style={{ height: '38px', padding: '0 20px', fontSize: '13px', gap: '6px' }}
+              >
+                {creatingTask ? (
+                  <span style={{ opacity: 0.7 }}>Creating…</span>
+                ) : (
+                  <><Plus size={14} /> Create Task</>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

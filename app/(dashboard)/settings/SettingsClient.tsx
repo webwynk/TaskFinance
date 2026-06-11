@@ -44,7 +44,7 @@ export default function SettingsClient({ user, session }: Props) {
     if (newPw !== confirmPw) { toast.error('Passwords do not match'); return }
     if (newPw.length < 6) { toast.error('Password must be at least 6 chars'); return }
     setSaving('password')
-    const res = await fetch('/api/auth/change-password', {
+    const res = await fetch('/api/auth-custom/change-password', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ currentPassword: currentPw, newPassword: newPw }),
     })

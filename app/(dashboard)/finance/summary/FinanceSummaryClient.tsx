@@ -356,45 +356,47 @@ export default function FinanceSummaryClient({ initialSummary }: Props) {
                 No categories to display
               </div>
             ) : (
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
-                <thead>
-                  <tr style={{ borderBottom: '1px solid var(--border-default)', color: 'var(--text-secondary)', textAlign: 'left' }}>
-                    <th style={{ padding: '8px', fontWeight: 600 }}>Category</th>
-                    <th style={{ padding: '8px', fontWeight: 600, textAlign: 'center' }}>Transactions</th>
-                    <th style={{ padding: '8px', fontWeight: 600, textAlign: 'right' }}>Total Spent</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {summary.byCategory.map(c => {
-                    const pct = summary.totalExpenses > 0 ? (c.total / summary.totalExpenses) * 100 : 0
-                    return (
-                      <tr key={c.categoryId} style={{ borderBottom: '1px solid var(--border-subtle)', color: 'var(--text-primary)' }}>
-                        <td style={{ padding: '10px 8px' }}>
-                          <span
-                            className="chip"
-                            style={{
-                              background: c.colorBg,
-                              color: c.colorText,
-                              border: `1px solid ${c.colorText}33`
-                            }}
-                          >
-                            {c.categoryName}
-                          </span>
-                        </td>
-                        <td style={{ padding: '10px 8px', textAlign: 'center', color: 'var(--text-secondary)' }}>
-                          {c.count}
-                        </td>
-                        <td style={{ padding: '10px 8px', textAlign: 'right', fontWeight: 500 }}>
-                          <div>{formatCurrency(c.total)}</div>
-                          <div style={{ fontSize: '10px', color: 'var(--text-tertiary)', marginTop: '2px' }}>
-                            {pct.toFixed(1)}% of expenses
-                          </div>
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
+              <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '1px solid var(--border-default)', color: 'var(--text-secondary)', textAlign: 'left' }}>
+                      <th style={{ padding: '8px', fontWeight: 600 }}>Category</th>
+                      <th style={{ padding: '8px', fontWeight: 600, textAlign: 'center' }}>Transactions</th>
+                      <th style={{ padding: '8px', fontWeight: 600, textAlign: 'right' }}>Total Spent</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {summary.byCategory.map(c => {
+                      const pct = summary.totalExpenses > 0 ? (c.total / summary.totalExpenses) * 100 : 0
+                      return (
+                        <tr key={c.categoryId} style={{ borderBottom: '1px solid var(--border-subtle)', color: 'var(--text-primary)' }}>
+                          <td style={{ padding: '10px 8px' }}>
+                            <span
+                              className="chip"
+                              style={{
+                                background: c.colorBg,
+                                color: c.colorText,
+                                border: `1px solid ${c.colorText}33`
+                              }}
+                            >
+                              {c.categoryName}
+                            </span>
+                          </td>
+                          <td style={{ padding: '10px 8px', textAlign: 'center', color: 'var(--text-secondary)' }}>
+                            {c.count}
+                          </td>
+                          <td style={{ padding: '10px 8px', textAlign: 'right', fontWeight: 500 }}>
+                            <div>{formatCurrency(c.total)}</div>
+                            <div style={{ fontSize: '10px', color: 'var(--text-tertiary)', marginTop: '2px' }}>
+                              {pct.toFixed(1)}% of expenses
+                            </div>
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
             )}
           </div>
         </div>

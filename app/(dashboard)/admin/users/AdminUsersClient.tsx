@@ -79,73 +79,74 @@ export default function AdminUsersClient({ users: initialUsers, currentUserId }:
         </button>
       </div>
 
-      {/* Table */}
       <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th>User</th>
-              <th>Role</th>
-              <th>Tasks</th>
-              <th>Entries</th>
-              <th>Joined</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map(user => (
-              <tr key={user.id}>
-                <td>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--color-lavender)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: 600, color: 'var(--color-lavender-deep)', flexShrink: 0 }}>
-                      {user.name[0].toUpperCase()}
-                    </div>
-                    <div>
-                      <p style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text-primary)' }}>{user.name}</p>
-                      <p style={{ fontSize: '12px', color: 'var(--text-tertiary)' }}>{user.email}</p>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <select
-                    value={user.role}
-                    onChange={e => changeRole(user.id, e.target.value)}
-                    style={{ fontSize: '13px', background: user.role === 'ADMIN' ? 'var(--color-lavender)' : 'var(--bg-input)', color: user.role === 'ADMIN' ? 'var(--color-lavender-deep)' : 'var(--text-primary)', border: 'none', borderRadius: 'var(--radius-sm)', padding: '4px 8px', cursor: 'pointer', fontFamily: 'DM Sans, sans-serif', fontWeight: 500 }}
-                    disabled={user.id === currentUserId}
-                  >
-                    <option value="USER">USER</option>
-                    <option value="ADMIN">ADMIN</option>
-                  </select>
-                </td>
-                <td><span className="chip" style={{ background: 'var(--color-lavender)', color: 'var(--color-lavender-deep)' }}>{user._count.tasks}</span></td>
-                <td><span className="chip" style={{ background: 'var(--color-sky)', color: 'var(--color-sky-deep)' }}>{user._count.financeEntries}</span></td>
-                <td style={{ color: 'var(--text-tertiary)', fontSize: '13px' }}>{formatDate(user.createdAt)}</td>
-                <td>
-                  <span className={`chip ${user.isActive ? 'chip-complete' : 'chip-overdue'}`}>
-                    {user.isActive ? 'Active' : 'Inactive'}
-                  </span>
-                </td>
-                <td>
-                  <button
-                    className="btn btn-sm"
-                    onClick={() => toggleActive(user.id, user.isActive)}
-                    disabled={user.id === currentUserId}
-                    style={{ background: user.isActive ? 'var(--color-rose)' : 'var(--color-mint)', color: user.isActive ? 'var(--color-rose-deep)' : 'var(--color-mint-deep)', fontSize: '12px' }}
-                  >
-                    {user.isActive ? 'Deactivate' : 'Activate'}
-                  </button>
-                </td>
+        <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Role</th>
+                <th>Tasks</th>
+                <th>Entries</th>
+                <th>Joined</th>
+                <th>Status</th>
+                <th>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {users.map(user => (
+                <tr key={user.id}>
+                  <td>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--color-lavender)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: 600, color: 'var(--color-lavender-deep)', flexShrink: 0 }}>
+                        {user.name[0].toUpperCase()}
+                      </div>
+                      <div>
+                        <p style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text-primary)' }}>{user.name}</p>
+                        <p style={{ fontSize: '12px', color: 'var(--text-tertiary)' }}>{user.email}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <select
+                      value={user.role}
+                      onChange={e => changeRole(user.id, e.target.value)}
+                      style={{ fontSize: '13px', background: user.role === 'ADMIN' ? 'var(--color-lavender)' : 'var(--bg-input)', color: user.role === 'ADMIN' ? 'var(--color-lavender-deep)' : 'var(--text-primary)', border: 'none', borderRadius: 'var(--radius-sm)', padding: '4px 8px', cursor: 'pointer', fontFamily: 'DM Sans, sans-serif', fontWeight: 500 }}
+                      disabled={user.id === currentUserId}
+                    >
+                      <option value="USER">USER</option>
+                      <option value="ADMIN">ADMIN</option>
+                    </select>
+                  </td>
+                  <td><span className="chip" style={{ background: 'var(--color-lavender)', color: 'var(--color-lavender-deep)' }}>{user._count.tasks}</span></td>
+                  <td><span className="chip" style={{ background: 'var(--color-sky)', color: 'var(--color-sky-deep)' }}>{user._count.financeEntries}</span></td>
+                  <td style={{ color: 'var(--text-tertiary)', fontSize: '13px' }}>{formatDate(user.createdAt)}</td>
+                  <td>
+                    <span className={`chip ${user.isActive ? 'chip-complete' : 'chip-overdue'}`}>
+                      {user.isActive ? 'Active' : 'Inactive'}
+                    </span>
+                  </td>
+                  <td>
+                    <button
+                      className="btn btn-sm"
+                      onClick={() => toggleActive(user.id, user.isActive)}
+                      disabled={user.id === currentUserId}
+                      style={{ background: user.isActive ? 'var(--color-rose)' : 'var(--color-mint)', color: user.isActive ? 'var(--color-rose-deep)' : 'var(--color-mint-deep)', fontSize: '12px' }}
+                    >
+                      {user.isActive ? 'Deactivate' : 'Activate'}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Create User Modal */}
       {showCreate && (
         <div className="modal-backdrop" onClick={e => { if (e.target === e.currentTarget) setShowCreate(false) }}>
-          <div className="modal-content animate-scale-in">
+          <div className="modal-content">
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
               <h2 className="text-h2" style={{ color: 'var(--text-primary)' }}>Create User</h2>
               <button className="btn btn-ghost btn-icon" onClick={() => setShowCreate(false)} aria-label="Close"><X size={18} /></button>

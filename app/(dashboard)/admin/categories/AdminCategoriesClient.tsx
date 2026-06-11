@@ -74,7 +74,7 @@ export default function AdminCategoriesClient({ categories: initial }: Props) {
       {/* Category grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '14px' }}>
         {categories.map(cat => (
-          <div key={cat.id} className="card" style={{ padding: '16px', borderLeft: `3px solid ${cat.colorText}`, opacity: cat.isActive ? 1 : 0.5 }}>
+          <div key={cat.id} className="card" style={{ padding: '16px', opacity: cat.isActive ? 1 : 0.5 }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '10px' }}>
               <span className="chip" style={{ background: cat.colorBg, color: cat.colorText, fontSize: '13px' }}>
                 {cat.icon && <span style={{ marginRight: '4px' }}>{cat.icon}</span>}
@@ -105,7 +105,7 @@ export default function AdminCategoriesClient({ categories: initial }: Props) {
       {/* Create Modal */}
       {showCreate && (
         <div className="modal-backdrop" onClick={e => { if (e.target === e.currentTarget) setShowCreate(false) }}>
-          <div className="modal-content animate-scale-in">
+          <div className="modal-content">
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
               <h2 className="text-h2" style={{ color: 'var(--text-primary)' }}>New Category</h2>
               <button className="btn btn-ghost btn-icon" onClick={() => setShowCreate(false)} aria-label="Close"><X size={18} /></button>

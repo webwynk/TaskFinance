@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { Plus } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils/formatCurrency'
 import toast from 'react-hot-toast'
@@ -28,6 +28,14 @@ export default function FinanceClient({ initialEntries, categories }: Props) {
   const [showForm, setShowForm] = useState(false)
   const [editEntry, setEditEntry] = useState<Entry | null>(null)
 
+  const [currentPage, setCurrentPage] = useState(1)
+  const ITEMS_PER_PAGE = 10
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [period, typeFilter, categoryFilter])
+
   const filtered = useMemo(() => {
     const now = new Date()
     return entries.filter(e => {
@@ -49,16 +57,22 @@ export default function FinanceClient({ initialEntries, categories }: Props) {
   const totalExpense = filtered.filter(e => e.type === 'EXPENSE').reduce((sum, e) => sum + Number(e.amount), 0)
   const totalIncome = filtered.filter(e => e.type === 'INCOME').reduce((sum, e) => sum + Number(e.amount), 0)
 
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE)
+  const paginatedEntries = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE
+    return filtered.slice(start, start + ITEMS_PER_PAGE)
+  }, [filtered, currentPage])
+
   // Group by date
   const grouped = useMemo(() => {
     const map = new Map<string, Entry[]>()
-    for (const entry of filtered) {
+    for (const entry of paginatedEntries) {
       const key = new Date(entry.date).toDateString()
       if (!map.has(key)) map.set(key, [])
       map.get(key)!.push(entry)
     }
     return Array.from(map.entries()).sort((a, b) => new Date(b[0]).getTime() - new Date(a[0]).getTime())
-  }, [filtered])
+  }, [paginatedEntries])
 
   const deleteEntry = async (id: string) => {
     if (!confirm('Delete this entry?')) return
@@ -203,6 +217,31 @@ export default function FinanceClient({ initialEntries, categories }: Props) {
             </div>
           )
         })
+      )}
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="pagination-container">
+          <span className="pagination-info">
+            Showing {Math.min(filtered.length, (currentPage - 1) * ITEMS_PER_PAGE + 1)}-{Math.min(filtered.length, currentPage * ITEMS_PER_PAGE)} of {filtered.length} entries
+          </span>
+          <div className="pagination-btn-group">
+            <button
+              className="pagination-btn"
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </button>
+            <button
+              className="pagination-btn"
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </button>
+          </div>
+        </div>
       )}
 
       {showForm && (

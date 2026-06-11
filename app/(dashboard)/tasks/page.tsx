@@ -14,7 +14,7 @@ export default async function TasksPage() {
     prisma.task.findMany({
       where: { userId: session.user.id },
       orderBy: [{ dueDate: 'asc' }, { createdAt: 'desc' }],
-      take: 50,
+      take: 1000,
     }),
     prisma.financeCategory.findMany({ where: { isActive: true } }),
   ])
