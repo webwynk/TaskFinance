@@ -1,12 +1,12 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { signOut } from 'next-auth/react'
 import {
   LayoutDashboard, CheckSquare, Wallet, Target, Settings,
   ShieldCheck, Users, Tag, ChevronLeft, ChevronRight, LogOut,
-  CheckSquare as Logo,
 } from 'lucide-react'
 import { useAppStore } from '@/store/appStore'
 
@@ -66,15 +66,16 @@ export default function Sidebar({ session }: SidebarProps) {
       }}>
         {!sidebarCollapsed && (
           <Link href="/dashboard" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
-            <div style={{
-              width: '32px', height: '32px',
-              background: 'var(--color-lavender)',
-              borderRadius: 'var(--radius-md)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              flexShrink: 0,
-            }}>
-              <Logo size={16} color="var(--color-lavender-deep)" />
-            </div>
+            <Image
+              src="/logo.png"
+              alt="TaskFinance Logo"
+              width={32}
+              height={32}
+              style={{
+                borderRadius: 'var(--radius-md)',
+                flexShrink: 0,
+              }}
+            />
             <span style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)', whiteSpace: 'nowrap' }}>
               TaskFinance
             </span>

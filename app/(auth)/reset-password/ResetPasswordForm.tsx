@@ -6,7 +6,8 @@ import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Eye, EyeOff, CheckSquare, Wallet, Check } from 'lucide-react'
+import { Eye, EyeOff, Check } from 'lucide-react'
+import Image from 'next/image'
 import toast from 'react-hot-toast'
 
 const resetSchema = z.object({
@@ -130,20 +131,15 @@ export default function ResetPasswordForm() {
             gap: '10px',
             marginBottom: '8px',
           }}>
-            <div style={{
-              width: '44px',
-              height: '44px',
-              background: 'var(--color-lavender)',
-              borderRadius: 'var(--radius-lg)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
-              <div style={{ display: 'flex', gap: '2px' }}>
-                <CheckSquare size={14} color="var(--color-lavender-deep)" />
-                <Wallet size={14} color="var(--color-mint-deep)" />
-              </div>
-            </div>
+            <Image
+              src="/logo.png"
+              alt="TaskFinance Logo"
+              width={44}
+              height={44}
+              style={{
+                borderRadius: 'var(--radius-lg)',
+              }}
+            />
             <span style={{
               fontSize: '22px',
               fontWeight: 600,
